@@ -1,0 +1,2291 @@
+package com.example.samu;
+
+import java.io.File;
+
+
+
+
+
+
+
+
+
+
+
+import javax.servlet.annotation.WebServlet;
+
+import repository.UserRepository;
+
+import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.event.LayoutEvents.LayoutClickEvent;
+import com.vaadin.event.LayoutEvents.LayoutClickListener;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.DefaultFieldFactory;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.UI;
+
+import controller.UserCtrl;
+
+@SuppressWarnings("serial")
+@Theme("samu")
+public class SamuUI extends UI {
+	int value;
+	UserCtrl ctr;
+	UserRepository ur = new UserRepository();
+	@WebServlet(value = "/*", asyncSupported = true)
+	@VaadinServletConfiguration(productionMode = false, ui = SamuUI.class)
+	public static class Servlet extends VaadinServlet {
+	}
+
+	
+	@Override
+	protected void init(VaadinRequest request) {
+		
+		LogInPage();
+		
+	}
+	
+	
+	public AbsoluteLayout studentPage(){
+		
+		AbsoluteLayout layout2 = new AbsoluteLayout();
+		setContent(layout2);
+		layout2.setWidth("100.0%");
+		layout2.setHeight("100.0%");
+		layout2.setStyleName("v-switch-slider-gruppe");
+		
+		layout2.addComponent(panel(),"top:0px;left:0px");
+		layout2.addComponent(dropmenu(),"top:15px;right:50px");
+		layout2.addComponent(name(),"top:25px;right:60px");
+		
+		Button b1 = new Button("See Grades");
+		b1.setStyleName("border");
+		b1.setWidth("420px");
+		b1.setHeight("102px");
+		layout2.addComponent(b1,"top: 220.0px; left: 500.0px;");
+		
+		
+		
+		Button b2 = new Button("Study Contract");
+		b2.setWidth("420px");
+		b2.setHeight("102px");
+		b2.setStyleName("border");
+		layout2.addComponent(b2, "top: 340.0px; left: 500.0px;" );
+		
+		
+		
+		Button b3 = new Button("Taxes");
+		b3.setWidth("420px");
+		b3.setHeight("102px");
+		b3.setStyleName("border");
+		layout2.addComponent(b3,"top: 460.0px; left: 500.0px;");
+		
+		b1.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentGrades();
+			}
+		});
+		
+		b2.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentContract();
+			}
+		});
+		
+		b3.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentRestante();
+			}
+		});
+		
+		return layout2;
+	}
+	
+	
+	private AbsoluteLayout studentRestante(){
+		final AbsoluteLayout layout3 = new AbsoluteLayout();
+		setContent(layout3);
+		layout3.setWidth("100.0%");
+		layout3.setHeight("100.0%");
+		layout3.setStyleName("v-switch-slider-gruppe");
+		layout3.addComponent(panel(),"top:0px;left:0px");
+		layout3.addComponent(dropmenu(),"top:15px;right:50px");
+		layout3.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentPage();
+			}
+		});
+		layout3.addComponent(b,"top:17px;left:35px");
+		
+		
+		TreeTable tt = new TreeTable();
+		   
+	    tt.addContainerProperty("Semester", String.class, "");
+	    tt.addContainerProperty("Cours name", String.class, "");
+	    tt.addContainerProperty("Credits", String.class, "");
+	    tt.addContainerProperty("Taxe", String.class, "");
+	    
+	    
+	    /*tt.addItem(new Object[]{"0","k 0","p 0"},0);
+	    tt.addItem(new Object[]{"1","k 1","p 1"},1);
+	    tt.addItem(new Object[]{"2","k 2","p 2"},2);*/
+	    //tt.addItem(new Object[]{"3","k 3","p 3"},3);  //works well    
+
+	    tt.setVisibleColumns(new Object[] {"Semester","Cours name","Credits","Taxe"});       
+
+	    //tt.addItem(new Object[]{"3","k 3","p 3"},3);    //doesn't work because of setVisibleColumns ....   
+	    
+		layout3.addComponent(tt,"left:255px;top:80px");
+		
+		/*String basepath = VaadinService.getCurrent()
+                .getBaseDirectory().getAbsolutePath();
+
+		// Image as a file resource
+		FileResource resource = new FileResource(new File(basepath +
+		                      "/WEB-INF/images/url.png"));
+		
+		// Show the image in the application
+		Image image = new Image("", resource);
+		image.setWidth("537px");
+		image.setHeight("137px");
+		image.setVisible(true);
+		layout3.addComponent(image, "top:110.0px; left: 350.0px");*/
+		return layout3;
+		
+	}
+	
+	public AbsoluteLayout LogInPage(){
+		final AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("backColor");
+	
+		TextField text = new TextField();
+		text.setWidth("200px");
+		text.setHeight("-1px");
+		layout.addComponent(text, "top: 408.0px; left: 600.0px");
+		
+		PasswordField p = new PasswordField();
+		p.setHeight("-1px");
+		p.setWidth("200px");
+		layout.addComponent(p, "top: 470.0px; left: 600.0px");
+	
+		
+		Label username = new Label("Username");
+		username.setWidth("80px");
+		username.setHeight("25px");
+		layout.addComponent(username, "top: 414.0px; left: 460.0px");
+		
+		Label password_label = new Label("Password");
+		password_label.setWidth("80px");
+		password_label.setHeight("25px");
+		layout.addComponent(password_label,"top: 474.0px; left: 460.0px");
+		
+		Button button = new Button( "Submit");
+		button.setWidth("-1px");
+		button.setHeight("-1px");
+		layout.addComponent(button, "top: 548.0px; left: 713.0px;");
+
+		
+		/*String basepath = VaadinService.getCurrent()
+                .getBaseDirectory().getAbsolutePath();
+
+		// Image as a file resource
+		FileResource resource = new FileResource(new File(basepath +
+		                      "/WEB-INF/images/images.jpg"));
+		
+		// Show the image in the application
+		Image image = new Image("Image from file", resource);
+		image.setWidth("537px");
+		image.setHeight("137px");
+		image.setVisible(true);
+		layout.addComponent(image, "top: 0.0px; left: 382.0px");*/
+		
+		layout.setStyleName("log");
+		
+		button.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				String uid = text.getValue();
+				String pass = p.getValue();
+				ctr = new UserCtrl(uid,ur);
+				value = ctr.logUser(uid,pass);
+				
+				if(value == 1){
+					studentPage();
+				}
+				if(value==2){
+					profesorPage();
+				}
+				if(value==3){
+					adminPage();
+				}
+				if(value==4){
+					chifPage();
+				}
+				/*if(text.getValue().equals("student")){
+					studentPage();
+					value=1;
+				}
+				else if(text.getValue().equals("profesor")){
+					profesorPage();
+					value=2;
+				}
+				else if(text.getValue().equals("admin")){
+					adminPage();
+					value=3;
+				}
+				else if(text.getValue().equals("cif")){
+					chifPage();
+					value=4;
+				}
+				else
+					layout.addComponent(new Label(text.getValue()));*/
+				
+			}
+
+			
+		});
+		
+		
+		return layout;
+	}
+	
+	
+	protected AbsoluteLayout chifPage() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		
+		Button b11 = new Button("Catalogue");
+		b11.setStyleName("border");
+		b11.setWidth("420px");
+		b11.setHeight("102px");
+		layout.addComponent(b11,"top: 220.0px; left: 500.0px;");
+		
+		Button b1 = new Button("Select Optional");
+		b1.setStyleName("border");
+		b1.setWidth("420px");
+		b1.setHeight("102px");
+		layout.addComponent(b1,"top: 340.0px; left: 500.0px;");
+		
+		
+		Button b2 = new Button("Propose Optionals Course");
+		b2.setWidth("420px");
+		b2.setHeight("102px");
+		b2.setStyleName("border");
+		layout.addComponent(b2, "top: 460.0px; left: 500.0px;" );
+		
+		
+		b11.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				professorCatalogue();
+			}
+		});
+		b1.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				adminSelectOptional();
+			}
+		});
+		
+		
+		b2.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				professorPropose();
+			}
+		});
+		return layout;
+		
+	}
+
+
+	protected AbstractLayout adminPage() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		
+		Button b1 = new Button("Select Optional");
+		b1.setStyleName("border");
+		b1.setWidth("420px");
+		b1.setHeight("102px");
+		layout.addComponent(b1,"top: 220.0px; left: 500.0px;");
+		
+		
+		Button sd = new Button("Add/Delete Student");
+		sd.setWidth("420px");
+		sd.setHeight("102px");
+		sd.setStyleName("border");
+		
+		layout.addComponent(sd,"top: 340.0px; left: 500.0px;");
+		
+		Button pd = new Button("Add/Delete Professor");
+		pd.setWidth("420px");
+		pd.setHeight("102px");
+		pd.setStyleName("border");
+		
+		layout.addComponent(pd,"top: 460.0px; left: 500.0px;");
+		
+		b1.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				adminSelectOptional();
+			}
+		});
+		
+		
+		sd.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				studentAddDelete();
+			}
+		});
+		
+		pd.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				profesorAddDelete();
+			}
+		});
+		return layout;
+	}
+
+
+	protected AbsoluteLayout profesorAddDelete() {
+		// TODO Auto-generated method stub
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminPage();
+			}
+		});
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		return layout;
+	}
+
+
+	protected AbsoluteLayout studentAddDelete() {
+		// TODO Auto-generated method stub
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminPage();
+			}
+		});
+		
+		
+		
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		return layout;
+	}
+
+
+	protected AbsoluteLayout adminSelectOptional() {
+		// TODO Auto-generated method stub
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if(value==3)
+					adminPage();
+				if(value==4){
+					chifPage();
+				}
+				
+			}
+		});
+		
+		TwinColSelect select = new TwinColSelect();
+		select.setWidth("505px");
+		select.setHeight("301px");
+		select.addItem("Cours 1");
+		select.addItem("Cours 2");
+		select.addItem("Cours 3");
+		
+		
+		
+		Button submit = new Button("SAVE");
+		
+		
+		layout.addComponent(submit,"top:462px;left:700px");
+		layout.addComponent(select,"top: 200.0px; left: 100.0px;");
+		layout.addComponent(b,"top:20px;left:35px");
+		return layout;
+	}
+
+
+	private AbsoluteLayout studentGrades(){
+		final AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("v-switch-slider-gruppe");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentPage();
+			}
+		});
+	
+		TreeTable tt = new TreeTable();
+	   
+	    tt.addContainerProperty("Semester", String.class, "");
+	    tt.addContainerProperty("Cours name", String.class, "");
+	    tt.addContainerProperty("Credits", String.class, "");
+	    tt.addContainerProperty("Grade", String.class, "");
+	    tt.addContainerProperty("Promovated", String.class, "");
+	    tt.addContainerProperty("Date", String.class, "");
+	    
+	    /*tt.addItem(new Object[]{"0","k 0","p 0"},0);
+	    tt.addItem(new Object[]{"1","k 1","p 1"},1);
+	    tt.addItem(new Object[]{"2","k 2","p 2"},2);*/
+	    //tt.addItem(new Object[]{"3","k 3","p 3"},3);  //works well    
+
+	    tt.setVisibleColumns(new Object[] {"Semester","Cours name","Credits","Grade","Promovated","Date"});       
+
+	    //tt.addItem(new Object[]{"3","k 3","p 3"},3);    //doesn't work because of setVisibleColumns ....   
+	    
+		layout.addComponent(tt,"left:255px;top:80px");
+		layout.addComponent(b,"top:20px;left:35px");
+
+		return layout;
+	}
+	
+	private AbsoluteLayout studentContract(){
+		final AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("v-switch-slider-gruppe");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button back = new Button("BACK");
+		back.setWidth("120px");
+		
+		Button print = new Button("PRINT");
+		print.setWidth("120px");
+		
+		Button save = new Button("SAVE");
+		save.setWidth("120px");
+		
+		NativeSelect check = new NativeSelect("Choose Semester");
+		check.setStyleName("black");
+		check.setWidth("200px");
+		check.setHeight("40px");
+		check.addItem("Semester 1");
+		check.addItem("Semester 2");
+		check.addItem("Semester 3");
+		
+		TwinColSelect select = new TwinColSelect();
+		select.setWidth("505px");
+		select.setHeight("301px");
+		select.addItem("Cours 1");
+		select.addItem("Cours 2");
+		select.addItem("Cours 3");
+		
+		layout.addComponent(check,"top: 125.0px; left: 100.0px;");
+		layout.addComponent(select,"top: 200.0px; left: 100.0px;");
+		layout.addComponent(back,"top:560px;left:100px");
+		layout.addComponent(print,"top:350px;left:800px");
+		layout.addComponent(save,"top: 300px; left:800px");
+		
+		back.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentPage();
+			}
+		});
+		
+		
+		
+		return layout;
+	}
+	
+	
+	private Panel panel(){
+		Panel h=new Panel();
+		h.setStyleName("headerpage");
+		h.setHeight("75px");
+		return h;
+	}
+	
+	@SuppressWarnings("deprecation")
+	private NativeSelect dropmenu(){
+		NativeSelect drop = new NativeSelect();
+		drop.addItem("Profile");
+		drop.addItem("Logout");
+		
+		drop.setWidth("220px");
+		drop.setHeight("45px");
+		//drop.setValue("PAlacean");
+        drop.addListener(new Property.ValueChangeListener() {
+           // private static final long serialVersionUID = 2754712574220857944L;
+
+            public void valueChange(ValueChangeEvent event) {
+                if((String)drop.getValue()=="Logout"){
+                	LogInPage();
+                	name().setVisible(false);
+                }
+                else if((String)drop.getValue()=="Profile"){
+                	if(value==1){
+                		studentProfile();
+                	}
+                	if(value==2){
+                		profesorProfile();
+                	}
+                	if(value==3){
+                		adminProfile();
+                	}
+                	if(value==4){
+                		chifProfile();
+                	}
+                }
+            }
+        });
+        drop.setImmediate(true);
+		return drop;
+	}
+	
+
+
+	protected AbsoluteLayout chifProfile() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				chifPage();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				chifChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				chifChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				chifChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		
+		
+
+		
+		return layout;
+		
+	}
+
+
+	protected AbsoluteLayout chifChangePassword() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Button submit = new Button("Submit");
+		Label password = new Label("Password");
+		Label newpassword = new Label("New Password");
+		Label newpassword2 = new Label("New Passwprd Again");
+		PasswordField text = new PasswordField();
+		PasswordField text1 = new PasswordField();
+		PasswordField text2 = new PasswordField();
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		newpassword2.setHeight("35px");
+		newpassword2.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		newpassword2.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		text2.setWidth("170px");
+		text2.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		layout.addComponent(newpassword2,"left:300px;top:260px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		layout.addComponent(text2,"left:560px;top:260px");
+		layout.addComponent(submit,"left:640px;top:320px");
+		
+				
+		return layout;
+		
+	}
+
+
+	protected AbsoluteLayout chifChangeUsername() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Label password = new Label("Username");
+		Label newpassword = new Label("New Username");
+		TextArea text = new TextArea();
+		TextArea text1 = new TextArea();
+		Button submit = new Button("Submit");
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		layout.addComponent(submit,"left:640px;top:260px");
+		
+				
+		return layout;
+		
+	}
+
+
+	protected AbsoluteLayout chifChangeData() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				chifChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		
+		
+				
+		return layout;
+		
+	}
+
+
+	protected AbsoluteLayout adminProfile() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				adminPage();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				adminChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				adminChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				adminChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		
+		
+
+		
+		return layout;
+	}
+
+
+	protected AbsoluteLayout adminChangeData() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		
+		
+				
+		return layout;
+		
+	}
+
+
+	protected AbsoluteLayout adminChangeUsername() {
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Label password = new Label("Username");
+		Label newpassword = new Label("New Username");
+		TextArea text = new TextArea();
+		TextArea text1 = new TextArea();
+		Button submit = new Button("Submit");
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		layout.addComponent(submit,"left:640px;top:260px");
+		
+				
+		return layout;
+	}
+
+
+	protected AbsoluteLayout adminChangePassword() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("adminpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Button submit = new Button("Submit");
+		Label password = new Label("Password");
+		Label newpassword = new Label("New Password");
+		Label newpassword2 = new Label("New Passwprd Again");
+		PasswordField text = new PasswordField();
+		PasswordField text1 = new PasswordField();
+		PasswordField text2 = new PasswordField();
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		newpassword2.setHeight("35px");
+		newpassword2.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		newpassword2.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		text2.setWidth("170px");
+		text2.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				adminChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		layout.addComponent(newpassword2,"left:300px;top:260px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		layout.addComponent(text2,"left:560px;top:260px");
+		layout.addComponent(submit,"left:640px;top:320px");
+		
+				
+		return layout;
+	}
+
+
+	private AbsoluteLayout studentProfile() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("v-switch-slider-gruppe");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		//TextField text = new TextField();
+		TextArea text = new TextArea();
+		text.setHeight("350px");
+		text.setWidth("600px");
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		Label name = new Label("Name: ");
+		name.setContentMode(Label.CONTENT_XHTML);		
+		name.setStyleName("label");
+		Label username = new Label("Username: ");
+		username.setContentMode(Label.CONTENT_XHTML);
+		username.setStyleName("label");
+		
+		
+		
+		
+		
+		
+		//........... alte campuri:D
+		
+		
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentPage();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeData();
+			}
+
+			
+		});
+		layout.addComponent(b,"top:17px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(name,"left:350px;top:140px");
+		layout.addComponent(username,"left:350px;top:185px");
+		
+		
+		
+		return layout;
+	}
+	
+	private Label name(){
+		Label l = new Label("Palacean Samuel");
+		l.setWidth("200px");
+		l.setHeight("35px");
+		return l;
+	}
+	
+	private AbsoluteLayout studentChangePassword() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("v-switch-slider-gruppe");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Button submit = new Button("Submit");
+		Label password = new Label("Password");
+		Label newpassword = new Label("New Password");
+		Label newpassword2 = new Label("New Passwprd Again");
+		PasswordField text = new PasswordField();
+		PasswordField text1 = new PasswordField();
+		PasswordField text2 = new PasswordField();
+		
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		newpassword2.setHeight("35px");
+		newpassword2.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		newpassword2.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		text2.setWidth("170px");
+		text2.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeData();
+			}
+
+			
+		});
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		layout.addComponent(newpassword2,"left:300px;top:260px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		layout.addComponent(text2,"left:560px;top:260px");
+		layout.addComponent(submit,"left:640px;top:320px");
+		return layout;
+	}
+	
+	
+	private AbsoluteLayout studentChangeUsername() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("v-switch-slider-gruppe");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Label password = new Label("Username");
+		Label newpassword = new Label("New Username");
+		//Label newpassword2 = new Label("New Passwprd Again");
+		TextArea text = new TextArea();
+		TextArea text1 = new TextArea();
+		//PasswordField text2 = new PasswordField();
+		Button submit = new Button("Submit");
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		//newpassword2.setHeight("35px");
+		//newpassword2.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		//newpassword2.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		//text2.setWidth("170px");
+		//text2.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeData();
+			}
+
+			
+		});
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		//layout.addComponent(newpassword2,"left:300px;top:260px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		//layout.addComponent(text2,"left:560px;top:260px");
+		layout.addComponent(submit,"left:640px;top:260px");
+		
+		return layout;
+	}
+	
+	private AbsoluteLayout studentChangeData() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("v-switch-slider-gruppe");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Label name = new Label("Name");
+		Label surname = new Label("Surname");
+		Label email = new Label("Email");
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				studentChangeData();
+			}
+
+			
+		});
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		
+		return layout;
+	}
+	
+	
+	private AbstractLayout profesorPage() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		
+		Button b1 = new Button("Catalogue");
+		b1.setStyleName("border");
+		b1.setWidth("420px");
+		b1.setHeight("102px");
+		layout.addComponent(b1,"top: 220.0px; left: 500.0px;");
+		
+		
+		Button b2 = new Button("Propose Optionals Course");
+		b2.setWidth("420px");
+		b2.setHeight("102px");
+		b2.setStyleName("border");
+		layout.addComponent(b2, "top: 340.0px; left: 500.0px;" );
+		
+		
+		
+		b1.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				professorCatalogue();
+			}
+		});
+		
+		
+		b2.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				professorPropose();
+			}
+		});
+		return layout;
+	}
+
+
+	protected AbstractLayout professorPropose() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if(value==2)
+					profesorPage();
+				if(value==4){
+					chifPage();
+				}
+			}
+		});
+		layout.addComponent(b,"top:20px;left:35px");
+		
+		Label name =new Label("Name");
+		name.setStyleName("titluri");
+		layout.addComponent(name,"top:125px;left:25px");
+		TextArea nume = new TextArea();
+		nume.setHeight("35px");
+		nume.setWidth("240px");
+		layout.addComponent(nume,"top:125px;left:180px");
+		
+		
+		Label descriere = new Label("Descriere");
+		descriere.setStyleName("titluri");
+		
+		layout.addComponent(descriere,"top:200px;left:25px");
+		
+		
+		TextArea desc = new TextArea();
+		desc.setHeight("100px");
+		desc.setWidth("240px");
+		layout.addComponent(desc,"top:200px;left:180px");
+		
+		Button submit = new Button("Propose");
+		layout.addComponent(submit,"top:350px;left:180px");
+		
+		
+		
+		return layout;
+	}
+
+
+	protected AbstractLayout professorCatalogue() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				if(value==2){
+				profesorPage();}
+				if(value==4){
+					chifPage();
+				}
+			}
+		});
+		layout.addComponent(b,"top:20px;left:35px");
+		
+		
+		
+		NativeSelect check = new NativeSelect("Choose Cours");
+		check.setStyleName("black");
+		check.setWidth("200px");
+		check.setHeight("40px");
+		check.addItem("a");
+		check.addItem("b");
+		check.addItem("c");
+		
+		layout.addComponent(check,"top: 125.0px; left: 100.0px;");
+		
+		
+		Grid grid = new Grid();
+		grid.setEditorEnabled(true);
+		grid.addColumn("Name", String.class);
+		grid.addColumn("ID", Integer.class);
+		grid.addColumn("Group",Integer.class);
+		grid.addColumn("Semester",Integer.class);
+		grid.addColumn("Grade",Integer.class);
+		grid.addColumn("Promovate",String.class);
+
+/*		// Add some data rows
+		grid.addRow("Nicolaus Copernicus", 1543);
+		grid.addRow("Galileo Galilei", 1564);
+		grid.addRow("Johannes Kepler", 1571);*/
+		grid.addRow("Sam",1,445,3,0,"false");
+		
+		grid.setColumnOrder("Name", "ID");
+		layout.addComponent(grid,"top:125px;left:400px");
+		
+		return layout;
+	}
+	
+	
+	protected AbsoluteLayout profesorProfile() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorPage();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		
+		
+				
+		return layout;
+	}
+
+
+	protected AbsoluteLayout profesorChangeData() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		
+		
+				
+		return layout;
+	}
+
+
+	protected AbstractLayout profesorChangeUsername() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Label password = new Label("Username");
+		Label newpassword = new Label("New Username");
+		//Label newpassword2 = new Label("New Passwprd Again");
+		TextArea text = new TextArea();
+		TextArea text1 = new TextArea();
+		//PasswordField text2 = new PasswordField();
+		Button submit = new Button("Submit");
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		//newpassword2.setHeight("35px");
+		//newpassword2.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		//newpassword2.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		//text2.setWidth("170px");
+		//text2.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		//layout.addComponent(newpassword2,"left:300px;top:260px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		//layout.addComponent(text2,"left:560px;top:260px");
+		layout.addComponent(submit,"left:640px;top:260px");
+		
+				
+		return layout;
+	}
+
+
+	protected AbstractLayout profesorChangePassword() {
+		
+		AbsoluteLayout layout = new AbsoluteLayout();
+		setContent(layout);
+		layout.setWidth("100.0%");
+		layout.setHeight("100.0%");
+		layout.setStyleName("professorpage");
+		layout.addComponent(panel(),"top:0px;left:0px");
+		layout.addComponent(dropmenu(),"top:15px;right:50px");
+		layout.addComponent(name(),"top:25px;right:60px");
+		Button b = new Button("Back");
+		Button changep = new Button("Change Password");
+		Button changeu = new Button("Change Username");
+		Button changed = new Button("Change data");
+		Button submit = new Button("Submit");
+		Label password = new Label("Password");
+		Label newpassword = new Label("New Password");
+		Label newpassword2 = new Label("New Passwprd Again");
+		PasswordField text = new PasswordField();
+		PasswordField text1 = new PasswordField();
+		PasswordField text2 = new PasswordField();
+		
+		changep.setHeight("35px");
+		changep.setWidth("170px");
+		changeu.setHeight("35px");
+		changeu.setWidth("170px");
+		changed.setHeight("35px");
+		changed.setWidth("170px");
+		password.setHeight("35px");
+		password.setWidth("250");
+		newpassword.setHeight("35px");
+		newpassword.setWidth("250");
+		newpassword2.setHeight("35px");
+		newpassword2.setWidth("250");
+		password.setStyleName("titluri");
+		newpassword.setStyleName("titluri");
+		newpassword2.setStyleName("titluri");
+		text.setWidth("170px");
+		text.setHeight("35px");
+		text2.setWidth("170px");
+		text2.setHeight("35px");
+		text1.setWidth("170px");
+		text1.setHeight("35px");
+		
+		
+		b.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorProfile();
+			}
+		});
+		
+		changep.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangePassword();
+			}
+
+			
+		});
+		
+		changeu.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeUsername();
+			}
+
+			
+		});
+
+		changed.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				
+				profesorChangeData();
+			}
+
+			
+		});
+		
+		
+		
+		layout.addComponent(b,"top:20px;left:35px");
+		layout.addComponent(changep,"left:35px;top:140px");
+		layout.addComponent(changeu,"left:35px;top:210px");
+		layout.addComponent(changed,"left:35px;top:280px");
+		layout.addComponent(password,"left:300px;top:140px");
+		layout.addComponent(newpassword,"left:300px;top:200px");
+		layout.addComponent(newpassword2,"left:300px;top:260px");
+		layout.addComponent(text,"left:560px;top:140px");
+		layout.addComponent(text1,"left:560px;top:200px");
+		layout.addComponent(text2,"left:560px;top:260px");
+		layout.addComponent(submit,"left:640px;top:320px");
+		
+				
+		return layout;
+	}
+	
+
+}
