@@ -1,0 +1,69 @@
+package controller;
+
+import repository.UserRepository;
+//import model.entities.*;
+import model.Functionalities.*;
+import model.entities.Admin;
+import model.entities.DepartmentChief;
+import model.entities.Secretary;
+import model.entities.Student;
+import model.entities.Teacher;
+import model.entities.User;
+
+
+public class UserCtrl {
+	private Login login;
+	
+	public UserCtrl(String userId, UserRepository uR) {
+		try {
+		login = new Login(uR);
+		
+		} catch (FunctionalityException ex) {
+			//handle exception - return error to ui
+			System.out.println(ex);
+		}
+	}
+	
+	public void testDB() {
+		try {
+			login.testDB();
+		} catch (Exception ex) {
+			//handle exception - return error to ui
+			System.out.println(ex);
+		}
+	}
+	
+	@SuppressWarnings("finally")
+	public int logUser(String userId, String pwd) {
+		try {
+			
+			User usr = login.logUser(userId,pwd);			
+			System.out.println(usr+" logged on");
+			
+		}catch (FunctionalityException ex) {
+			//handle exception - return error to ui
+			System.out.println(ex);
+		}
+		finally{
+			switch (userId) {
+			case("u1"): { //admin
+				return 3;
+			}					
+			case("u2"): { //secretary
+				return 3;
+			}					
+			case("u3"): { //deptchief
+				return 4;
+			}
+			case("u4"): { //teacher
+				return 2;
+			}
+			default: { //student
+				return 1;
+			} 
+		}
+		}
+	}
+	
+	
+}
